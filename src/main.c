@@ -5,9 +5,15 @@
 #include "esp_http_client.h"
 #include "esp_log.h"
 #include "freertos/semphr.h"
+#include "sdkconfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
 
 #include "wifi.h"
 #include "http_client.h"
+
+#define LED 2
 
 xSemaphoreHandle conexaoWifiSemaphore;
 
@@ -24,6 +30,20 @@ void RealizaHTTPRequest(void * params)
   }
 }
 
+void configure_led(void *params)
+{
+    gpio_pad_select_gpio(LED);
+    gpio_set_direction(LED, GPIO_MODE_OUTPUT);
+
+    int estado = 0;
+    while (true)
+    {
+        gpio_set_level(LED, estado);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        estado = !estado;
+    }
+}
+
 void app_main(void)
 {
     // Inicializa o NVS
@@ -38,5 +58,5 @@ void app_main(void)
     wifi_start();
 
     xTaskCreate(&RealizaHTTPRequest,  "Processa HTTP", 4096, NULL, 1, NULL);
-    
+    xTaskCreate(&configure_led, "Configura LED", 4096, NULL, 1, NULL);
 }
