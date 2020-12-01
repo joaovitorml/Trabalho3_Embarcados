@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "cJSON.h"
 
-#include "../inc/json_parser.h"
+#include "../include/json_parser.h"
 
 double temp;
 double temp_min;
@@ -21,13 +21,13 @@ void string_to_substrings_ipstack(char * string){
     longi=cJSON_GetObjectItemCaseSensitive(json, "longitude")->valuedouble;
 
     printf("Latitude: %lf\n",lati);
-    printf("Longitude: %lf\n",longi);
+    printf("Longitude: %lf\n\n",longi);
 
     cJSON_Delete(json);
 }
 
 void string_to_substrings_open_weather(char * string){
-    
+
     //printf("Info completa: %s\n", string);
     cJSON * json = cJSON_Parse(string);
     cJSON * main_obj = cJSON_GetObjectItem(json, "main");
@@ -37,10 +37,10 @@ void string_to_substrings_open_weather(char * string){
     temp_max=cJSON_GetObjectItemCaseSensitive(main_obj, "temp_max")->valuedouble;
     umi=cJSON_GetObjectItemCaseSensitive(main_obj, "humidity")->valuedouble;
 
-    printf("Temperatura Atual: %lf\n",temp);
+    printf("\nTemperatura Atual: %lf\n",temp);
     printf("Temperatura Mínima: %lf\n",temp_min);
-    printf("Temperatura Máxima: %lf\n",temp_min);
-    printf("Umidade: %lf\n",temp_min);
+    printf("Temperatura Máxima: %lf\n",temp_max);
+    printf("Umidade: %lf\n\n",umi);
 
     cJSON_Delete(json);
 }

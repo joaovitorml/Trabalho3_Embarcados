@@ -9,18 +9,20 @@
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"
 
-#include "../inc/wifi.h"
-#include "../inc/http_client.h"
+#include "../include/wifi.h"
+#include "../include/http_client.h"
+#include "../include/led_control.h"
 
-#define LED 2
 #define IPSTACK_KEY CONFIG_IPSTACK_API_KEY
 #define OPEN_WEATHER_KEY CONFIG_OPEN_WEATHER_API_KEY
 
 xSemaphoreHandle conexaoWifiSemaphore;
 
 TaskHandle_t led_handler = NULL;
+
+extern double lati;
+extern double longi;
 
 void RealizaHTTPRequest(void * params)
 {
@@ -30,18 +32,19 @@ void RealizaHTTPRequest(void * params)
     {
       ESP_LOGI("Main Task", "Realiza HTTP Request");
       while(1){
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+
+        vTaskDelay(2500 / portTICK_PERIOD_MS);
         char ipstack_url[100] = "";
         strcat(ipstack_url, "http://api.ipstack.com/189.6.35.88?access_key=");
         strcat(ipstack_url, IPSTACK_KEY);
-        printf("%s\n",ipstack_url);
+        printf("\nConectando a: %s\n\n",ipstack_url);
         http_request(ipstack_url);
 
-        vTaskDelay(3000 / portTICK_PERIOD_MS);
-        char open_weather_url[100] = "";
-        strcat(open_weather_url, "http://api.openweathermap.org/data/2.5/weather?lat=-15.865970&lon=-47.877022&appid=");
-        strcat(open_weather_url, OPEN_WEATHER_KEY);
-        printf("%s\n",open_weather_url);
+        vTaskDelay(2500 / portTICK_PERIOD_MS);
+        char open_weather_url[200] = "";
+        sprintf(open_weather_url,"http://api.openweathermap.org/data/2.5/weather?lat=%lf&lon=%lf&appid=%s",
+            lati, longi, OPEN_WEATHER_KEY);
+        printf("\nConectando a: %s\n\n",open_weather_url);
         http_request(open_weather_url);
       }
     }
@@ -50,32 +53,7 @@ void RealizaHTTPRequest(void * params)
 
 void configure_led(void *params)
 {
-    gpio_pad_select_gpio(LED);
-    gpio_set_direction(LED, GPIO_MODE_OUTPUT);
-
-    int estado = 0;
-    while (true)
-    {    
-        if(!ulTaskNotifyTake(pdTRUE, 1000 / portTICK_PERIOD_MS)){
-          printf("LED piscando. Conectando ao WI-FI...\n");
-          gpio_set_level(LED, estado);
-          estado = !estado;
-        }
-        else{
-            while(true){
-              if(ulTaskNotifyTake(pdTRUE, 1000 / portTICK_PERIOD_MS)){
-                printf("LED piscando\n");
-                gpio_set_level(LED, estado);
-                estado = !estado;
-              }
-              else{
-                printf("LED aceso. WI-FI está conectado\n");
-                estado = 1;
-                gpio_set_level(LED, estado);
-              }
-          }
-        }
-    }
+    led_control();
 }
 
 void app_main(void)
@@ -92,7 +70,7 @@ void app_main(void)
 
     conexaoWifiSemaphore = xSemaphoreCreateBinary();
 
-    vTaskDelay(3000 / portTICK_PERIOD_MS);
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
 
     wifi_start();
     xTaskCreate(&RealizaHTTPRequest,  "Processa HTTP", 10000, NULL, 1, NULL);

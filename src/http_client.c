@@ -4,8 +4,8 @@
 
 #include <string.h>
 
-#include "../inc/http_client.h"
-#include "../inc/json_parser.h"
+#include "../include/http_client.h"
+#include "../include/json_parser.h"
 
 #define TAG "HTTP"
 
