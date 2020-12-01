@@ -9,8 +9,8 @@
 
 #define TAG "HTTP"
 
-char string[8000];
-int tamanho = 0;
+char string[1000];
+int tamanho;
 
 esp_err_t _http_event_handle(esp_http_client_event_t *evt)
 {   
@@ -21,6 +21,7 @@ esp_err_t _http_event_handle(esp_http_client_event_t *evt)
         case HTTP_EVENT_ON_CONNECTED:
             ESP_LOGI(TAG, "HTTP_EVENT_ON_CONNECTED");
             memset(string, 0, strlen(string));
+            tamanho = 0;
             break;
         case HTTP_EVENT_HEADER_SENT:
             ESP_LOGI(TAG, "HTTP_EVENT_HEADER_SENT");

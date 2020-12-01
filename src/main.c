@@ -26,8 +26,11 @@ void RealizaHTTPRequest(void * params)
     if(xSemaphoreTake(conexaoWifiSemaphore, portMAX_DELAY))
     {
       ESP_LOGI("Main Task", "Realiza HTTP Request");
-      http_request("http://api.ipstack.com/189.6.35.88?access_key=12b592c8b219620b2b8dbbd0ddc3f3a5");
-      //https_request();
+      while(1){
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+        http_request("http://api.ipstack.com/189.6.35.88?access_key=12b592c8b219620b2b8dbbd0ddc3f3a5");
+        http_request("http://api.openweathermap.org/data/2.5/weather?lat=-15.865970&lon=-47.877022&appid=7b8a29f9b93a78a05b2eaf12478b2ad9");
+      }
     }
   }
 }
@@ -46,10 +49,17 @@ void configure_led(void *params)
           estado = !estado;
         }
         else{
-          while(!ulTaskNotifyTake(pdTRUE, 5000 / portTICK_PERIOD_MS)){
-            printf("LED aceso, está conectado\n");
-            estado = 1;
-            gpio_set_level(LED, estado);
+            while(true){
+              if(ulTaskNotifyTake(pdTRUE, 1000 / portTICK_PERIOD_MS)){
+                printf("Pisca LED\n");
+                gpio_set_level(LED, estado);
+                estado = !estado;
+              }
+              else{
+                printf("LED aceso, está conectado\n");
+                estado = 1;
+                gpio_set_level(LED, estado);
+              }
           }
         }
     }
@@ -72,5 +82,5 @@ void app_main(void)
     vTaskDelay(5000 / portTICK_PERIOD_MS);
 
     wifi_start();
-    xTaskCreate(&RealizaHTTPRequest,  "Processa HTTP", 20000, NULL, 1, NULL);
+    xTaskCreate(&RealizaHTTPRequest,  "Processa HTTP", 10000, NULL, 1, NULL);
 }
