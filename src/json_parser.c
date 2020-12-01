@@ -14,7 +14,7 @@ double longi;
 
 void string_to_substrings_ipstack(char * string){
 
-    printf("Info completa: %s\n", string);
+    //printf("Info completa: %s\n", string);
     cJSON * json = cJSON_Parse(string);
     
     lati=cJSON_GetObjectItemCaseSensitive(json, "latitude")->valuedouble;
@@ -27,7 +27,8 @@ void string_to_substrings_ipstack(char * string){
 }
 
 void string_to_substrings_open_weather(char * string){
-    printf("Info completa: %s\n", string);
+    
+    //printf("Info completa: %s\n", string);
     cJSON * json = cJSON_Parse(string);
     cJSON * main_obj = cJSON_GetObjectItem(json, "main");
 

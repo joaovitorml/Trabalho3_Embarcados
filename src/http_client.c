@@ -37,17 +37,13 @@ esp_err_t _http_event_handle(esp_http_client_event_t *evt)
             break;
         case HTTP_EVENT_ON_FINISH:
             ESP_LOGI(TAG, "HTTP_EVENT_ON_FINISH");
-            printf("tamanho: %d\n",tamanho);
             string[tamanho + 1] = '\0';
             if(string[2]=='i'){
-                printf("ponto de controle 1\n");
                 string_to_substrings_ipstack(string);
             }
             else{
-                printf("ponto de controle 2\n");
                 string_to_substrings_open_weather(string);
             }
-            printf("ponto de controle 3\n");
             break;
         case HTTP_EVENT_DISCONNECTED:
             ESP_LOGI(TAG, "HTTP_EVENT_DISCONNECTED");

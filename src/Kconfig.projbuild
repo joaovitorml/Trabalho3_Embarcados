@@ -17,4 +17,12 @@ menu "Configuração do Wifi Configuration"
         default 5
         help
             Configure o valor máximo de tentativas de conexão.
+
+    config IPSTACK_API_KEY
+        string "Key da API do Ipstack"
+        default "12b592c8b219620b2b8dbbd0ddc3f3a5"
+
+    config OPEN_WEATHER_API_KEY
+        string "Key da API do Open Weather"
+        default "7b8a29f9b93a78a05b2eaf12478b2ad9"
 endmenu
