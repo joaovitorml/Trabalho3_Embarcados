@@ -3,8 +3,14 @@
 #include "esp_event.h"
 #include "esp_http_client.h"
 #include "esp_log.h"
+#include "cJSON.h"
+
+#include "json_parser.h"
 
 #define TAG "HTTP"
+
+cJSON *json;
+const cJSON * continent_name = NULL;
 
 esp_err_t _http_event_handle(esp_http_client_event_t *evt)
 {
@@ -19,15 +25,11 @@ esp_err_t _http_event_handle(esp_http_client_event_t *evt)
             ESP_LOGI(TAG, "HTTP_EVENT_HEADER_SENT");
             break;
         case HTTP_EVENT_ON_HEADER:
-            ESP_LOGI(TAG, "HTTP_EVENT_ON_HEADER");
+            ESP_LOGI(TAG, "HTTP_EVENT_ON_HEADER, len=%d", evt->data_len);
             printf("%.*s", evt->data_len, (char*)evt->data);
             break;
         case HTTP_EVENT_ON_DATA:
             ESP_LOGI(TAG, "HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
-            if (!esp_http_client_is_chunked_response(evt->client)) {
-                printf("%.*s", evt->data_len, (char*)evt->data);
-            }
-
             break;
         case HTTP_EVENT_ON_FINISH:
             ESP_LOGI(TAG, "HTTP_EVENT_ON_FINISH");
@@ -39,13 +41,12 @@ esp_err_t _http_event_handle(esp_http_client_event_t *evt)
     return ESP_OK;
 }
 
-void http_request(){
+void http_request(char link[]){
     esp_http_client_config_t config = {
-        .url = "http://api.ipstack.com/189.6.35.88?access_key=12b592c8b219620b2b8dbbd0ddc3f3a5",
+        .url = link,
         .event_handler = _http_event_handle,
     };
     esp_http_client_handle_t client = esp_http_client_init(&config);
-    printf("teste\n");
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {

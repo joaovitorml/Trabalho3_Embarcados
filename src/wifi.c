@@ -24,6 +24,8 @@
 
 static EventGroupHandle_t s_wifi_event_group;
 
+extern TaskHandle_t led_handler;
+
 static int s_retry_num = 0;
 extern xSemaphoreHandle conexaoWifiSemaphore;
 
@@ -90,6 +92,7 @@ void wifi_start(){
     if (bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
                  WIFI_SSID, WIFI_PASS);
+        xTaskNotifyGive(led_handler);
     } else if (bits & WIFI_FAIL_BIT) {
         ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
                  WIFI_SSID, WIFI_PASS);

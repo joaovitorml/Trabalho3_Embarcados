@@ -17,6 +17,8 @@
 
 xSemaphoreHandle conexaoWifiSemaphore;
 
+TaskHandle_t led_handler = NULL;
+
 void RealizaHTTPRequest(void * params)
 {
   while(true)
@@ -24,7 +26,7 @@ void RealizaHTTPRequest(void * params)
     if(xSemaphoreTake(conexaoWifiSemaphore, portMAX_DELAY))
     {
       ESP_LOGI("Main Task", "Realiza HTTP Request");
-      http_request();
+      http_request("http://api.ipstack.com/189.6.35.88?access_key=12b592c8b219620b2b8dbbd0ddc3f3a5");
       //https_request();
     }
   }
@@ -37,10 +39,19 @@ void configure_led(void *params)
 
     int estado = 0;
     while (true)
-    {
-        gpio_set_level(LED, estado);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        estado = !estado;
+    {    
+        if(!ulTaskNotifyTake(pdTRUE, 1000 / portTICK_PERIOD_MS)){
+          printf("Pisca LED\n");
+          gpio_set_level(LED, estado);
+          estado = !estado;
+        }
+        else{
+          while(!ulTaskNotifyTake(pdTRUE, 5000 / portTICK_PERIOD_MS)){
+            printf("LED aceso, está conectado\n");
+            estado = 1;
+            gpio_set_level(LED, estado);
+          }
+        }
     }
 }
 
@@ -54,9 +65,12 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
     
-    conexaoWifiSemaphore = xSemaphoreCreateBinary();
-    wifi_start();
+    xTaskCreate(&configure_led, "Configura LED", 10000, NULL, 1, &led_handler);
 
-    xTaskCreate(&RealizaHTTPRequest,  "Processa HTTP", 4096, NULL, 1, NULL);
-    xTaskCreate(&configure_led, "Configura LED", 4096, NULL, 1, NULL);
+    conexaoWifiSemaphore = xSemaphoreCreateBinary();
+
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+
+    wifi_start();
+    xTaskCreate(&RealizaHTTPRequest,  "Processa HTTP", 10000, NULL, 1, NULL);
 }
