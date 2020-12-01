@@ -10,8 +10,8 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 
-#include "wifi.h"
-#include "http_client.h"
+#include "../inc/wifi.h"
+#include "../inc/http_client.h"
 
 #define LED 2
 
@@ -72,5 +72,5 @@ void app_main(void)
     vTaskDelay(5000 / portTICK_PERIOD_MS);
 
     wifi_start();
-    xTaskCreate(&RealizaHTTPRequest,  "Processa HTTP", 10000, NULL, 1, NULL);
+    xTaskCreate(&RealizaHTTPRequest,  "Processa HTTP", 20000, NULL, 1, NULL);
 }

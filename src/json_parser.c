@@ -1,26 +1,45 @@
-#include "cJSON.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "cJSON.h"
 
-void string_to_json_ipstack(const char * const string)
-{
-    const cJSON * continent_name = NULL;
-    const cJSON * country_name = NULL;
-    const cJSON * region_name = NULL;
-    const cJSON * city = NULL;
-    cJSON *string_json = cJSON_Parse(string);
+#include "../inc/json_parser.h"
 
-    char *string_ipstack = cJSON_Print(string_json);
-    //printf("\n%s\n",string_ipstack);
-    if (string_json == NULL)
-    {
-        const char *error_ptr = cJSON_GetErrorPtr();
-        if (error_ptr != NULL)
-        {
-            fprintf(stderr, "Error before: %s\n", error_ptr);
-        }
-    }
+double temp;
+double temp_min;
+double temp_max;
+double umi;
 
-    continent_name = cJSON_GetObjectItemCaseSensitive(string_json, "continent_name");
+double lati;
+double longi;
+
+void string_to_substrings_ipstack(char * string){
+
+    printf("Info completa: %s\n", string);
+    cJSON * json = cJSON_Parse(string);
     
+    lati=cJSON_GetObjectItemCaseSensitive(json, "latitude")->valuedouble;
+    longi=cJSON_GetObjectItemCaseSensitive(json, "longitude")->valuedouble;
+
+    printf("Latitude: %lf\n",lati);
+    printf("Longitude: %lf\n",longi);
+
+    cJSON_Delete(json);
+}
+
+void string_to_substrings_open_weather(char * string){
+    printf("Info completa: %s\n", string);
+    cJSON * json = cJSON_Parse(string);
+    cJSON * main_obj = cJSON_GetObjectItem(json, "main");
+
+    temp=cJSON_GetObjectItemCaseSensitive(main_obj, "temp")->valuedouble;
+    temp_min=cJSON_GetObjectItemCaseSensitive(main_obj, "temp_min")->valuedouble;
+    temp_max=cJSON_GetObjectItemCaseSensitive(main_obj, "temp_max")->valuedouble;
+    umi=cJSON_GetObjectItemCaseSensitive(main_obj, "humidity")->valuedouble;
+
+    printf("Temperatura Atual: %lf\n",temp);
+    printf("Temperatura Mínima: %lf\n",temp_min);
+    printf("Temperatura Máxima: %lf\n",temp_min);
+    printf("Umidade: %lf\n",temp_min);
+
+    cJSON_Delete(json);
 }
