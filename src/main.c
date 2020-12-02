@@ -33,18 +33,20 @@ void RealizaHTTPRequest(void * params)
       ESP_LOGI("Main Task", "Realiza HTTP Request");
       while(1){
 
-        vTaskDelay(2500 / portTICK_PERIOD_MS);
+        vTaskDelay(4000 / portTICK_PERIOD_MS);
         char ipstack_url[100] = "";
         strcat(ipstack_url, "http://api.ipstack.com/189.6.35.88?access_key=");
         strcat(ipstack_url, IPSTACK_KEY);
         printf("\nConectando a: %s\n\n",ipstack_url);
+        xTaskNotifyGive(led_handler);
         http_request(ipstack_url);
 
-        vTaskDelay(2500 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
         char open_weather_url[200] = "";
         sprintf(open_weather_url,"http://api.openweathermap.org/data/2.5/weather?lat=%lf&lon=%lf&appid=%s",
             lati, longi, OPEN_WEATHER_KEY);
         printf("\nConectando a: %s\n\n",open_weather_url);
+        xTaskNotifyGive(led_handler);
         http_request(open_weather_url);
       }
     }

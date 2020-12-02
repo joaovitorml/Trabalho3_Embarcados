@@ -20,7 +20,7 @@ void string_to_substrings_ipstack(char * string){
     lati=cJSON_GetObjectItemCaseSensitive(json, "latitude")->valuedouble;
     longi=cJSON_GetObjectItemCaseSensitive(json, "longitude")->valuedouble;
 
-    printf("Latitude: %lf\n",lati);
+    printf("\nLatitude: %lf\n",lati);
     printf("Longitude: %lf\n\n",longi);
 
     cJSON_Delete(json);

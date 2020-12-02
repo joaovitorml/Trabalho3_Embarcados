@@ -25,8 +25,8 @@ void led_control(void *params)
             while(true){
               if(ulTaskNotifyTake(pdTRUE, 1000 / portTICK_PERIOD_MS)){
                 printf("LED piscando. Requisição feita.\n");
-                gpio_set_level(LED, estado);
                 estado = !estado;
+                gpio_set_level(LED, estado);
               }
               else{
                 printf("LED aceso. WI-FI está conectado\n");
